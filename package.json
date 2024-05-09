@@ -1,0 +1,38 @@
+{
+  "name": "syp-user-defined",
+  "private": true,
+  "version": "1.0.0",
+  "author": {
+    "name": "申云鹏",
+    "email": "2287674693@qq.com",
+    "url": "https://www.hitushen.top/"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@jiaminghi/data-view": "^2.10.0",
+    "axios": "^1.5.0",
+    "echarts": "^5.4.3",
+    "element-plus": "^2.3.12",
+    "md-editor-v3": "^4.6.1",
+    "pinia": "^2.1.6",
+    "pinia-plugin-persist": "^1.0.0",
+    "qs": "^6.11.2",
+    "sass": "^1.66.1",
+    "vant": "^4.6.8",
+    "vite-plugin-qrcode": "^0.2.3",
+    "vue": "^3.3.4",
+    "vue-draggable-plus": "^0.4.0",
+    "vue-meta": "^3.0.0-alpha.8",
+    "vue-router": "^4.2.4",
+    "vue3-eventbus": "^2.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "vite": "^4.4.5"
+  }
+}
