@@ -1,7 +1,8 @@
 <template>
-  <el-input
+  <el-input-number
     v-model="item.default"
-    type="textarea"
+    type="text"
+    :min="0"
     :placeholder="item.forItemList.placeholder"
     :maxlength="item.forItemList.maxlength"
     :clearable="item.forItemList.clearable"

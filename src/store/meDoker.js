@@ -10,7 +10,8 @@ export const meDoker = defineStore("main", {
             workAreaDocker: {
                 //表单属性
                 formSize: "default",//组件大小
-                labelPosition: 'left',//位置位置
+                labelPosition: 'right',//位置位置
+                disabled: false,//是否禁用全部
                 workArea: []
             },
             //当前工作区选中
