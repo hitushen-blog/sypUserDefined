@@ -4,7 +4,12 @@ import { join } from "path";
 import { qrcode } from 'vite-plugin-qrcode'
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [vue(), qrcode()],
+    plugins: [vue({
+        script: {
+            // 开启defineModel
+            defineModel: true
+        }
+    }), qrcode()],
     resolve: {
         alias: {
             '@': join(__dirname, "src"),

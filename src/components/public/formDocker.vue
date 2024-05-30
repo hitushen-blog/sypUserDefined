@@ -2,68 +2,108 @@
   <el-form
     class="w100p h90p"
     ref="formRef"
-    :model="workAreaDocker"
-    :size="workAreaDocker.formSize"
-    :label-position="workAreaDocker.labelPosition"
-    :disabled="workAreaDocker.disabled"
+    :model="getWorkArea"
+    :size="getWorkArea.formSize"
+    :label-position="getWorkArea.labelPosition"
+    :disabled="getWorkArea.disabled"
   >
-    <el-row class="w100p h100p">
-      <VueDraggable
-        class="w100p h100p"
-        v-model="workAreaDocker.workArea"
-        animation="150"
-        :group="{ name: 'people' }"
-        ghostClass="ghost"
-        @update="onUpdate"
-        @add="onAdd"
-        @remove="remove"
+    <VueDraggable
+      class="w100p h100p"
+      v-model="getWorkArea.workArea"
+      animation="150"
+      ghostClass="ghost"
+      :group="{ name: 'people' }"
+      @update="onUpdate"
+      @add="onAdd"
+      @remove="remove"
+    >
+      <template
+        v-for="(item, index) in getWorkArea.workArea"
+        :key="item.formItemId"
       >
         <el-col
-          :span="item.forItemList.formItemLabelWidth"
-          v-for="(item, index) in workAreaDocker.workArea"
-          :key="item.formItemId"
+          :span="24"
           @dragstart="selectIndex(index, 'mover')"
           @dragend="selectEnter()"
           @click="selectIndex(index)"
           :class="{
-            bg_1: item.formItemId == store.getCurrent.formItemId,
-            'el-color': mover && item.formItemId == store.getCurrent.formItemId,
+            'el-color': getMover && item.formItemId == contentIndex,
           }"
         >
-          <el-form-item
-            :label="item.label"
-            :prop="'workArea[' + index + '].default'"
-            :rules="
-              rules.getVerify(item.forItemList.rules)[item.forItemList.rules]
-            "
-            :required="item.forItemList.required"
-          >
-            <component :is="getComponent(item.componentmp)" :item="item">
-            </component>
-          </el-form-item>
-        </el-col>
-      </VueDraggable>
-    </el-row>
+          <el-col :span="item.forItemList.formItemLabelWidth">
+            <el-form-item
+              class="el-col-list"
+              :class="{
+                bg_1: !getMover && item.formItemId == contentIndex,
+                containernot: item.componentmp == 'sContainer',
+                container:
+                  !getMover &&
+                  item.formItemId == contentIndex &&
+                  item.componentmp == 'sContainer',
+              }"
+              :label-width="
+                !item.forItemList['label-width']
+                  ? 0
+                  : getWorkArea['label-width']
+              "
+              :label="
+                typeof item.forItemList.rules == 'undefined' ? '' : item.label
+              "
+              :prop="'workArea[' + index + '].default'"
+              :rules="
+                typeof item.forItemList.rules == 'undefined'
+                  ? []
+                  : rules.getVerify(item.forItemList.rules)[
+                      item.forItemList.rules
+                    ]
+              "
+              :required="item.forItemList.required"
+            >
+              <div
+                class="el-col-list-btn"
+                v-if="item.formItemId == contentIndex"
+              >
+                <el-button
+                  :icon="DocumentCopy"
+                  size="small"
+                  circle
+                  @click.stop="copyComponent(item)"
+                />
+                <el-button
+                  :icon="Delete"
+                  size="small"
+                  circle
+                  @click.stop="deleteComponent(item)"
+                />
+              </div>
 
-    <el-form-item>
+              <component
+                :is="getComponent(item.componentmp)"
+                :item="item"
+                :dataIndex="index"
+              >
+              </component>
+            </el-form-item>
+          </el-col>
+        </el-col>
+      </template>
+    </VueDraggable>
+
+    <!-- <el-form-item>
       <el-button type="primary" @click="submitForm(formRef)">Submit</el-button>
       <el-button @click="resetForm(formRef)">Reset</el-button>
-    </el-form-item>
+    </el-form-item> -->
   </el-form>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, nextTick, computed } from "vue";
+//导入图标
+import { Delete, DocumentCopy } from "@element-plus/icons-vue";
 //组件
-import {
-  sInput,
-  sTextarea,
-  sInputPassword,
-  sInputNumber,
-  sRadio,
-} from "@/components/public/index.js";
+import sComponents from "@/components/public/index.js";
 //常用表单数据
-import { setTool, setInput, setRadio } from "@/config/tool.js";
+import tool from "@/config/tool.js";
 //拖拽组件
 import { VueDraggable } from "vue-draggable-plus";
 // ref获取dom
@@ -72,73 +112,78 @@ const formRef = ref(null);
 import formVerify from "@/config/formVerify.js";
 let rules = new formVerify();
 //仓库
+import { storeToRefs } from "pinia";
 import { meDoker } from "@/store/meDoker.js";
+
 const store = meDoker();
 //工作区域 // 表单的属性
-const workAreaDocker = store.getworkArea;
-const mover = ref(false);
+const { getWorkArea, getMover, contentIndex } = storeToRefs(store);
 
-const componentMap = {
-  // 创建一个映射，将类型映射到组件
-  sInput: sInput,
-  sTextarea: sTextarea,
-  sInputPassword: sInputPassword,
-  sInputNumber: sInputNumber,
-  sRadio: sRadio,
-  // ... 其他方法 将类型映射到JSON
-  setInput: setInput,
-  setRadio: setRadio,
-};
+//组件和组件属性的映射对象
+const componentMap = {};
+
 //获取组件函数
 function getComponent(params) {
   return componentMap[params];
 }
 
 onMounted(() => {
-  //   console.log(rules);
-  //   Object.entries(rules).forEach(([sInput, sTextarea]) => {
-  //     console.log(sInput, sTextarea);
-  //   });
-  console.log();
+  //组件集合进行映射
+  Object.entries(sComponents).forEach(([key, value]) => {
+    componentMap[key] = value;
+  });
+  //将组件独有属性进行映射
+  Object.entries(tool).forEach(([key, value]) => {
+    componentMap[key] = value;
+  });
 });
 
-function onUpdate() {
-  console.log("update");
-}
 //拖动添加时处理内容的方法
 function onAdd(e) {
   console.log("Add");
   const newIndex = e.newIndex; // 获取darggable组件列表新增项的下标
-  store.setcontentIndex(newIndex);
-  const formCmp = workAreaDocker.workArea[newIndex];
+  const formCmp = getWorkArea.value.workArea[newIndex];
   if (!formCmp.formItemId) {
-    formCmp.formItemId = // 生成唯一id
-      formCmp.type + "_" + Date.now() + "_" + Math.ceil(Math.random() * 99999);
+    formCmp.formItemId = formCmp.type + store.getNewId(); // 生成唯一id
   }
-  console.log(formCmp.type);
   formCmp.forItemList = {};
-  Object.entries(setTool).forEach(([key, value]) => {
-    formCmp.forItemList[key] = value;
-  });
   //单独需要处理的方法
   Object.entries(componentMap[formCmp.type]).forEach(([key, value]) => {
     formCmp.forItemList[key] = value;
   });
+  if (formCmp.forItemList.setTool) {
+    Object.entries(formCmp.forItemList.setTool).forEach(([key, value]) => {
+      formCmp.forItemList[key] = value;
+    });
+  }
+  store.setContentIndex(getWorkArea.value.workArea[newIndex].formItemId);
 }
-function remove() {
-  console.log("remove");
+//更新
+function onUpdate(e) {
+  console.log(e, "update");
+  store.setContentIndex(getWorkArea.value.workArea[e.newIndex].formItemId);
+}
+//移除
+function remove(e) {
+  console.log(e, "remove");
 }
 function selectIndex(newIndex, pop) {
   if (pop == "mover") {
     setTimeout(() => {
-      mover.value = true;
+      store.setGeneral({
+        key: "mover",
+        value: true,
+      });
     }, 0);
   }
-  store.setcontentIndex(newIndex);
+  store.setContentIndex(getWorkArea.value.workArea[newIndex].formItemId);
 }
 function selectEnter(params) {
-  mover.value = false;
   console.log("拖拽结束");
+  store.setGeneral({
+    key: "mover",
+    value: false,
+  });
 }
 function submitForm(formEl) {
   console.log(formEl);
@@ -156,14 +201,39 @@ function resetForm(formEl) {
   console.log("清空表单");
   formEl.resetFields();
 }
+function copyComponent(params) {
+  store.setComponents(getWorkArea.value.workArea, params);
+}
+function deleteComponent(params) {
+  console.log(params, "删除");
+  store.deleteworkAreaDocker(getWorkArea.value.workArea, params);
+}
 </script>
 
 <style lang="scss" scoped>
 .el-form-item {
   padding: 12px 10px;
 }
+.el-col-list {
+  position: relative;
+  .el-col-list-btn {
+    position: absolute;
+    top: -20px;
+    right: 20px;
+    z-index: 99;
+  }
+}
+.containernot {
+  color: #bbb;
+  border: 1px dashed #bbb;
+}
+.container {
+  color: #409eff;
+  border: 1px dashed #409eff;
+  background-color: transparent;
+}
 .el-color {
   background-color: #67c23a;
-  border-radius: 6px;
+  border-top: 3px solid #409eff;
 }
 </style>

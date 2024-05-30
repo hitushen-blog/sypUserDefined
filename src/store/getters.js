@@ -1,13 +1,14 @@
 export default {
     //当前工作区内容
-    getworkArea() {
+    getWorkArea() {
         return this.workAreaDocker
     },
-    //当前工作区选中
-    getcontentIndex() {
-        return this.contentIndex
-    },
+    //获取当前选中的组件
     getCurrent() {
-        return this.workAreaDocker.workArea[this.contentIndex]
-    }
+        return this.getCurrentNext(this.workAreaDocker.workArea) || {}
+    },
+    //是否拖动
+    getMover() {
+        return this.mover
+    },
 }

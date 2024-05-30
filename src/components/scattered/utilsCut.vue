@@ -16,8 +16,9 @@
       :key="item"
     >
       <el-icon class="pl5 pr5">
-        <Link />
+        <component :is="item.icon"></component>
       </el-icon>
+
       <span>{{ item.label }}</span>
     </div>
   </VueDraggable>

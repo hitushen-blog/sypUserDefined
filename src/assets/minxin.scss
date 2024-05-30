@@ -22,7 +22,7 @@ $content-bg-color: #fff;
 $theme-color: #FFFFFF;
 // 系统背景色
 $bg-color-theme1: #FFFFFF; // 默认背景色
-$bg-color-theme2: #5B668C; // 切换的背景色
+$bg-color-theme2: #262727; // 切换的背景色
 
 //颜色
 $back-color1: #191919; //深色
@@ -70,6 +70,24 @@ $back-color11: #F3F4F6; //聊天气泡
         background-color: $bg-color-theme2 !important;
 
 
+        // 文字类型
+        .text_1 {
+            color: #fff !important;
+        }
+
+        // 背景类型
+        .bg_1 {
+            background: #f6f7ff;
+        }
+
+        // 边框
+        .bdr_1 {
+            border: 1px solid #4C4D4F;
+        }
+
+        .bdr_2 {
+            border: 1px dashed #4C4D4F;
+        }
     }
 }
 
@@ -1244,6 +1262,11 @@ $back-color11: #F3F4F6; //聊天气泡
     user-select: none;
 }
 
+.move {
+    cursor: move !important;
+    user-select: none;
+}
+
 .borderbox {
     box-sizing: border-box;
 }
@@ -1281,4 +1304,8 @@ $back-color11: #F3F4F6; //聊天气泡
     -webkit-line-clamp: $count;
     display: -webkit-box;
     -webkit-box-orient: vertical;
+}
+
+.overflow-Y {
+    overflow-y: auto;
 }
